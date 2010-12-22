@@ -263,7 +263,7 @@ static long htc_diag_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 		wake_up(&ctxt->read_wq);
 	break;
 	case USB_DIAG_FUNC_IOC_ENABLE_GET:
-		tmp_value = !_context.function.hidden;
+		tmp_value = !_context.function.disabled;
 		if (copy_to_user(argp, &tmp_value, sizeof(tmp_value)))
 			return -EFAULT;
 	break;
@@ -1324,7 +1324,7 @@ static int diag_function_set_alt(struct usb_function *f,
 	dev->diag_configured = 1;
 	spin_unlock_irqrestore(&dev_lock , flags);
 
-	dev->online = !dev->function.hidden;
+	dev->online = !dev->function.disabled;
 #if USB_TO_USERSPACE
 
 	/* recycle unhandled rx reqs to user if any */
@@ -1708,9 +1708,9 @@ int diag_bind_config(struct usb_configuration *c)
 	INIT_LIST_HEAD(&ctxt->dev_read_req_list);
 	INIT_LIST_HEAD(&ctxt->dev_write_req_list);
 	INIT_WORK(&ctxt->diag_work, usb_config_work_func);
-	ctxt->function.hidden = !_context.function_enable;
+	ctxt->function.disabled = !_context.function_enable;
 	smsc251x_set_diag_boot_flag(_context.function_enable);
-	if (!ctxt->function.hidden)
+	if (!ctxt->function.disabled)
 		diag_smd_enable("diag_bind_config", 1);
 #if USB_TO_USERSPACE
 
@@ -1807,7 +1807,7 @@ static int diag_set_enabled(const char *val, struct kernel_param *kp)
 
 static int diag_get_enabled(char *buffer, struct kernel_param *kp)
 {
-	buffer[0] = '0' + !_context.function.hidden;
+	buffer[0] = '0' + !_context.function.disabled;
 	return 1;
 }
 module_param_call(enabled, diag_set_enabled, diag_get_enabled, NULL, 0664);

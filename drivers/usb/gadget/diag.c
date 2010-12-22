@@ -458,6 +458,7 @@ static void diag_dsp_in_complete(struct usb_ep *ept, struct usb_request *req)
 }
 #endif
 
+#if 0
 static void diag_process_hdlc(struct diag_context *ctxt, void *_data, unsigned len)
 {
 	unsigned char *data = _data;
@@ -494,6 +495,7 @@ static void diag_process_hdlc(struct diag_context *ctxt, void *_data, unsigned l
 	ctxt->hdlc_count = count;
 	ctxt->hdlc_escape = escape;
 }
+#endif
 
 #if ROUTE_TO_USERSPACE
 static int if_route_to_userspace(struct diag_context *ctxt, unsigned int cmd_id)
@@ -870,7 +872,7 @@ module_param_call(tx_rx_count, NULL, diag_get_tx_rx_count, NULL, 0444);
 
 static int diag_get_enabled(char *buffer, struct kernel_param *kp)
 {
-	buffer[0] = '0' + !_context.function.hidden;
+	buffer[0] = '0' + !_context.function.disabled;
 	return 1;
 }
 module_param_call(enabled, diag_set_enabled, diag_get_enabled, NULL, 0664);
@@ -903,8 +905,9 @@ int diag_bind_config(struct usb_configuration *c)
 	ctxt->function.unbind = diag_function_unbind;
 	ctxt->function.set_alt = diag_function_set_alt;
 	ctxt->function.disable = diag_function_disable;
-
 	ctxt->function.hidden = !_context.function_enable;
+	ctxt->function.disabled = !_context.function_enable;
+
 
 	return usb_add_function(c, &ctxt->function);
 }
