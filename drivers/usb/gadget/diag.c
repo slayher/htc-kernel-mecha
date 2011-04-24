@@ -905,7 +905,6 @@ int diag_bind_config(struct usb_configuration *c)
 	ctxt->function.unbind = diag_function_unbind;
 	ctxt->function.set_alt = diag_function_set_alt;
 	ctxt->function.disable = diag_function_disable;
-	ctxt->function.hidden = !_context.function_enable;
 	ctxt->function.disabled = !_context.function_enable;
 
 
